@@ -1,4 +1,6 @@
 dataset
+outputs
+npydataset
 tfds
 models
 torchmodels

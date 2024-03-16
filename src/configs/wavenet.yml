@@ -1,5 +1,6 @@
 model_dir: ${datetime:"checkpoints/wavenet"}
 model:
+  input_channels: 2
   residual_layers: 30
   residual_channels: 128
   dilation_cycle_length: 10
