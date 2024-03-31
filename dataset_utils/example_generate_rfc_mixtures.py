@@ -14,7 +14,7 @@ import rfcutils
 import tensorflow as tf
 
 get_db = lambda p: 10*np.log10(p)
-get_pow = lambda s: np.mean(np.abs(s)**2)
+get_pow = lambda s: np.mean(np.abs(s)**2, axis=-1)
 get_sinr = lambda s, i: get_pow(s)/get_pow(i)
 get_sinr_db = lambda s, i: get_db(get_sinr(s,i))
 
@@ -73,6 +73,10 @@ def generate_dataset(sig_data, soi_type, interference_sig_type, sig_len, n_examp
 
         sig_mixture = sig_target + sig_interference * coeff
 
+        actual_sinr_db = get_sinr_db(sig_target, sig_interference * coeff).reshape(-1, 1)
+
+        metadata = np.hstack([rand_sinr_db, actual_sinr_db])
+        
         sig_mixture_comp = tf.stack((tf.math.real(sig_mixture), tf.math.imag(sig_mixture)), axis=-1)
         sig_target_comp = tf.stack((tf.math.real(sig_target), tf.math.imag(sig_target)), axis=-1)
 
@@ -82,7 +86,8 @@ def generate_dataset(sig_data, soi_type, interference_sig_type, sig_len, n_examp
         with h5py.File(os.path.join(foldername, mixture_filename), 'w') as h5file0:
             h5file0.create_dataset('mixture', data=sig_mixture_comp)
             h5file0.create_dataset('target', data=sig_target_comp)
-            h5file0.create_dataset('sig_type', data=f'{soi_type}_{interference_sig_type}_mixture')
+            h5file0.create_dataset('metadata', data=metadata)
+            h5file0.create_dataset('sig_type', data=f"{soi_type}_{interference_sig_type}_mixture")
 
         del sig1, sig2, sig_mixture_comp, sig_target_comp
     return 0

@@ -20,9 +20,11 @@ class RFMixtureDatasetBase(Dataset):
 
     def __getitem__(self, i):
         data = np.load(self.files[i], allow_pickle=True).item()
+
         return {
-            "sample_mix": torch.tensor(data["sample_mix"]).transpose(0, 1),
-            "sample_soi": torch.tensor(data["sample_soi"]).transpose(0, 1),
+            "sample_mix": torch.tensor(data["sample_mix"]).transpose(0, 1), # (2, 40960)
+            "sample_soi": torch.tensor(data["sample_soi"]).transpose(0, 1), # (2, 40960)
+            "sample_metadata": torch.tensor(data["sample_metadata"]), # (2,)
         }
     
 

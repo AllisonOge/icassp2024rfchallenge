@@ -1,11 +1,13 @@
-import os, sys
+import os
+import sys
 import glob
 import h5py
 import numpy as np
 from tqdm import tqdm
 
-main_folder = os.path.abspath(os.path.join(os.path.dirname(__file__),'..'))
+main_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 print(main_folder)
+
 
 def preprocess_dataset(root_dir: str, save_dir: str) -> None:
     save_dir = os.path.join(save_dir, os.path.basename(root_dir))
@@ -16,10 +18,14 @@ def preprocess_dataset(root_dir: str, save_dir: str) -> None:
         with h5py.File(folder, "r") as f:
             mixture = np.array(f.get("mixture"))
             soi = np.array(f.get("target"))
+            metadata = np.array(f.get("metadata"))
+            sig_type = np.array(f.get("sig_type"))
         for i in range(mixture.shape[0]):
             data = {
                 "sample_mix": mixture[i, ...],
                 "sample_soi": soi[i, ...],
+                "sample_metadata": metadata[i, ...],
+                "sig_type": sig_type,
             }
             np.save(os.path.join(save_dir, f"sample_{count}.npy"), data)
             count += 1
@@ -27,5 +33,5 @@ def preprocess_dataset(root_dir: str, save_dir: str) -> None:
 
 if __name__ == "__main__":
     dataset_type = sys.argv[1]
-    preprocess_dataset(root_dir=f'{main_folder}/dataset/Dataset_{dataset_type}_Mixture', 
+    preprocess_dataset(root_dir=f'{main_folder}/dataset/Dataset_{dataset_type}_Mixture',
                        save_dir=f'{main_folder}/npydataset/')
